@@ -1,4 +1,4 @@
-# bdd — Go를 위한 BDD·ZDD 꾸러미
+# Go를 위한 BDD·ZDD 꾸러미
 
 크누스가 『The Art of Computer Programming』 7.1.4절을 준비하며 쓴 두 습작
 [**BDD14**](https://www-cs-faculty.stanford.edu/~knuth/programs/bdd14.w)와
