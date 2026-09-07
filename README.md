@@ -301,4 +301,3 @@ if err := b.Check(); err != nil {
   problems," *DAC* (1993), 272–277
 - R. Rudell, "Dynamic variable ordering for ordered binary decision diagrams,"
   *ICCAD* (1993), 42–47
-- [dancing-cells](https://github.com/sjnam/dancing-cells) — 이 저장소의 모델
