@@ -12,10 +12,6 @@
 @s ZDD int
 @s Scanner int
 @s File int
-@s calc int
-@s bdd int
-@s bufio int
-@s any int
 
 @* 들어가며.
 크누스의 \.{BDD14}와 \.{BDD15}는 라이브러리가 아니라 {\it 대화식 프로그램\/}

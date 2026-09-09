@@ -4,9 +4,6 @@
 
 @s Func int
 @s ZDD int
-@s bdd int
-@s sort int
-@s strings int
 
 @* 들어가며.
 불 함수를 적는 가장 흔한 꼴은 {\it 곱의 합\/}이다. 리터럴을 곱해 항을

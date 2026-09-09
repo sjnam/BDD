@@ -5,9 +5,6 @@
 
 @s Func int
 @s Int int
-@s big int
-@s bdd int
-@s time int
 
 @* 들어가며.
 페그 솔리테어는 십자 모양 판에 파인 서른세 구멍과 말 서른두 개로 하는

@@ -4,10 +4,8 @@
 
 @s Cleanup int
 @s Mutex int
-@s Int int
+@s big.Int int
 @s Rand int
-@s big int
-@s rand int
 
 @* 들어가며.
 크누스는 {\sl The Art of Computer Programming\/} 7.1.4절 ``이진 결정 다이어그램''을

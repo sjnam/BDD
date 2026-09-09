@@ -5,9 +5,6 @@
 @s Func int
 @s ZDD int
 @s Int int
-@s bdd int
-@s big int
-@s rand int
 
 @* 들어가며.
 그래프의 {\it 독립집합\/}은 서로 이웃하지 않은 정점들의 모임이다. 간선

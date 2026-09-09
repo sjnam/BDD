@@ -4,7 +4,6 @@
 
 @s Func int
 @s BDD int
-@s bdd int
 
 @* 들어가며.
 서로 잡아먹지 못하게 퀸 $n$개를 $n\times n$ 판에 놓는 문제다. 1848년에

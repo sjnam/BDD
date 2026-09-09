@@ -5,10 +5,7 @@
 
 @s Func int
 @s ZDD int
-@s Int int
-@s big int
-@s bdd int
-@s slices int
+@s big.Int int
 
 @* 들어가며.
 $8\times8$ 격자의 왼쪽 위 모퉁이에서 오른쪽 아래 모퉁이까지, 같은 칸을 두 번

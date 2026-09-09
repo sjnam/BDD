@@ -5,8 +5,6 @@
 
 @s Func int
 @s BDD int
-@s bdd int
-@s rand int
 
 @* 들어가며.
 BDD의 크기는 함수의 성질이 아니다. {\it 함수와 변수 차례, 그 둘의\/}

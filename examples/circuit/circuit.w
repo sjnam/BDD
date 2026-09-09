@@ -5,8 +5,6 @@
 
 @s Func int
 @s BDD int
-@s bdd int
-@s rand int
 
 @* 들어가며.
 회로를 두 벌 만들었다고 하자. 하나는 읽기 쉽게 짠 것이고 하나는 빠르게

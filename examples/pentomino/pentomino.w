@@ -5,9 +5,6 @@
 
 @s Func int
 @s ZDD int
-@s bdd int
-@s rand int
-@s sort int
 
 @* 들어가며.
 정사각형 다섯 개를 변끼리 붙여 만들 수 있는 모양은 뒤집고 돌린 것을 같다고
