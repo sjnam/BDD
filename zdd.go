@@ -1,4 +1,4 @@
-//line zdd.w:42
+//line zdd.w:43
 package bdd
 
 import (
@@ -8,13 +8,13 @@ import (
 	"slices"
 )
 
-//line zdd.w:63
+//line zdd.w:64
 type ZDD struct {
 	base
 	n int32 // 원소의 수
 }
 
-//line zdd.w:152
+//line zdd.w:153
 const (
 	zopAnd     = int32(1)  // 교집합
 	zopButnot  = int32(2)  // 차집합
@@ -28,7 +28,7 @@ const (
 	zopDisprod = int32(12) // 서로소 결합
 )
 
-//line zdd.w:719
+//line zdd.w:720
 const (
 	zternMux   = int32(0) // $f{?}\,g{:}\,h$
 	zternMed   = int32(1) // $\langle fgh\rangle$
@@ -37,12 +37,12 @@ const (
 	zternSym   = int32(4) // 대칭 함수
 )
 
-//line zdd.w:77
+//line zdd.w:78
 func NewZDD(n int) *ZDD {
 	b := &ZDD{n: int32(n)}
 	b.init(true)
 
-//line zdd.w:95
+//line zdd.w:96
 	for k := int32(0); k < b.n; k++ {
 		b.newLevel(k)
 		b.vars[k].name, b.vmap = k, append(b.vmap, k)
@@ -60,14 +60,14 @@ func NewZDD(n int) *ZDD {
 		p = r
 	}
 
-//line zdd.w:81
+//line zdd.w:82
 	return b
 }
 
-//line zdd.w:117
+//line zdd.w:118
 func (b *ZDD) Empty() Func { return b.wrap(botsink) }
 
-//line zdd.w:118
+//line zdd.w:119
 func (b *ZDD) Unit() Func { return b.wrap(topsink) }
 
 func (b *ZDD) Universe() Func {
@@ -81,7 +81,7 @@ func (b *ZDD) N() int { return int(b.n) }
 
 func (b *ZDD) taut(v int32) int32 { return b.vars[v].taut }
 
-//line zdd.w:135
+//line zdd.w:136
 func (b *ZDD) Elt(k int) Func {
 	b.drain()
 	p := b.vars[b.level(int32(k))].elt
@@ -94,7 +94,7 @@ func (b *ZDD) Var(k int) Func {
 	return b.wrap(b.projection(b.level(int32(k))))
 }
 
-//line zdd.w:167
+//line zdd.w:168
 func (b *ZDD) binary(op int32, f, g Func) Func {
 	p, q := b.node(f), b.node(g)
 	b.drain()
@@ -125,7 +125,7 @@ func (b *ZDD) binaryRec(op, f, g int32) int32 {
 	return b.disprodRec(f, g)
 }
 
-//line zdd.w:205
+//line zdd.w:206
 func (b *ZDD) andRec(f, g int32) int32 {
 	vf, vg := b.mem[f].lvl, b.mem[g].lvl
 	for vf != vg {
@@ -144,7 +144,7 @@ func (b *ZDD) andRec(f, g int32) int32 {
 		}
 	}
 
-//line zdd.w:226
+//line zdd.w:227
 	if f == g {
 		b.ref(f)
 		return f
@@ -167,10 +167,10 @@ func (b *ZDD) andRec(f, g int32) int32 {
 	r1 := b.andRec(b.mem[f].hi, b.mem[g].hi)
 	return b.memo(f, g, zopAnd, b.uniqueFind(vf, r0, r1))
 
-//line zdd.w:223
+//line zdd.w:224
 }
 
-//line zdd.w:253
+//line zdd.w:254
 func (b *ZDD) orRec(f, g int32) int32 {
 	if f == g {
 		b.ref(f)
@@ -187,7 +187,7 @@ func (b *ZDD) orRec(f, g int32) int32 {
 		return r
 	}
 
-//line zdd.w:272
+//line zdd.w:273
 	vf, vg := b.mem[f].lvl, b.mem[g].lvl
 	var v, r0, r1 int32
 	switch {
@@ -215,10 +215,10 @@ func (b *ZDD) orRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, zopOr, b.uniqueFind(v, r0, r1))
 
-//line zdd.w:269
+//line zdd.w:270
 }
 
-//line zdd.w:301
+//line zdd.w:302
 func (b *ZDD) xorRec(f, g int32) int32 {
 	if f == g {
 		return botsink
@@ -234,7 +234,7 @@ func (b *ZDD) xorRec(f, g int32) int32 {
 		return r
 	}
 
-//line zdd.w:319
+//line zdd.w:320
 	vf, vg := b.mem[f].lvl, b.mem[g].lvl
 	var v, r0, r1 int32
 	switch {
@@ -253,10 +253,10 @@ func (b *ZDD) xorRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, zopXor, b.uniqueFind(v, r0, r1))
 
-//line zdd.w:316
+//line zdd.w:317
 }
 
-//line zdd.w:344
+//line zdd.w:345
 func (b *ZDD) butNotRec(f, g int32) int32 {
 	if f == g || f == botsink {
 		return botsink
@@ -278,7 +278,7 @@ func (b *ZDD) butNotRec(f, g int32) int32 {
 		}
 	}
 
-//line zdd.w:368
+//line zdd.w:369
 	if r := b.cacheLookup(f, g, zopButnot); r != null {
 		return r
 	}
@@ -292,22 +292,22 @@ func (b *ZDD) butNotRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, zopButnot, b.uniqueFind(vf, r0, r1))
 
-//line zdd.w:365
+//line zdd.w:366
 }
 
-//line zdd.w:384
+//line zdd.w:385
 func (b *ZDD) Union(f, g Func) Func { return b.binary(zopOr, f, g) }
 
-//line zdd.w:385
+//line zdd.w:386
 func (b *ZDD) Intersect(f, g Func) Func { return b.binary(zopAnd, f, g) }
 
-//line zdd.w:386
+//line zdd.w:387
 func (b *ZDD) Diff(f, g Func) Func { return b.binary(zopButnot, f, g) }
 
-//line zdd.w:387
+//line zdd.w:388
 func (b *ZDD) Xor(f, g Func) Func { return b.binary(zopXor, f, g) }
 
-//line zdd.w:402
+//line zdd.w:403
 func (b *ZDD) prodRec(f, g int32) int32 {
 	if f > g {
 		f, g = g, f
@@ -328,7 +328,7 @@ func (b *ZDD) prodRec(f, g int32) int32 {
 		return r
 	}
 
-//line zdd.w:431
+//line zdd.w:432
 	var r0, r1 int32
 	if vf != vg {
 		r0 = b.prodRec(b.mem[f].lo, g)
@@ -345,10 +345,10 @@ func (b *ZDD) prodRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, zopProd, b.uniqueFind(v, r0, r1))
 
-//line zdd.w:422
+//line zdd.w:423
 }
 
-//line zdd.w:453
+//line zdd.w:454
 func (b *ZDD) disprodRec(f, g int32) int32 {
 	if f > g {
 		f, g = g, f
@@ -369,7 +369,7 @@ func (b *ZDD) disprodRec(f, g int32) int32 {
 		return r
 	}
 
-//line zdd.w:478
+//line zdd.w:479
 	var r0, r1 int32
 	if vf != vg {
 		r0 = b.disprodRec(b.mem[f].lo, g)
@@ -384,10 +384,10 @@ func (b *ZDD) disprodRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, zopDisprod, b.uniqueFind(v, r0, r1))
 
-//line zdd.w:473
+//line zdd.w:474
 }
 
-//line zdd.w:497
+//line zdd.w:498
 func (b *ZDD) coprodRec(f, g int32) int32 {
 	if f > g {
 		f, g = g, f
@@ -400,7 +400,7 @@ func (b *ZDD) coprodRec(f, g int32) int32 {
 		return r
 	}
 
-//line zdd.w:515
+//line zdd.w:516
 	v, vf, vg := b.mem[f].lvl, b.mem[f].lvl, b.mem[g].lvl
 	var r int32
 	if vf != vg {
@@ -423,10 +423,10 @@ func (b *ZDD) coprodRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, zopCoprod, r)
 
-//line zdd.w:509
+//line zdd.w:510
 }
 
-//line zdd.w:544
+//line zdd.w:545
 func (b *ZDD) deltaRec(f, g int32) int32 {
 	if f > g {
 		f, g = g, f
@@ -447,7 +447,7 @@ func (b *ZDD) deltaRec(f, g int32) int32 {
 		return r
 	}
 
-//line zdd.w:567
+//line zdd.w:568
 	var r0, r1 int32
 	if vf != vg {
 		r0 = b.deltaRec(b.mem[f].lo, g)
@@ -466,10 +466,10 @@ func (b *ZDD) deltaRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, zopDelta, b.uniqueFind(v, r0, r1))
 
-//line zdd.w:564
+//line zdd.w:565
 }
 
-//line zdd.w:599
+//line zdd.w:600
 func (b *ZDD) ezremRec(f, vg int32) int32 {
 	vf := b.mem[f].lvl
 	if vf == vg {
@@ -490,7 +490,7 @@ func (b *ZDD) ezremRec(f, vg int32) int32 {
 	return b.memo(f, e, zopRem, b.uniqueFind(vf, r0, r1))
 }
 
-//line zdd.w:620
+//line zdd.w:621
 func (b *ZDD) ezquotRec(f, vg int32) int32 {
 	vf := b.mem[f].lvl
 	if vf == vg {
@@ -510,7 +510,7 @@ func (b *ZDD) ezquotRec(f, vg int32) int32 {
 	return b.memo(f, e, zopQuot, b.uniqueFind(vf, r0, r1))
 }
 
-//line zdd.w:643
+//line zdd.w:644
 func (b *ZDD) quotRec(f, g int32) int32 {
 	switch {
 	case g == topsink:
@@ -531,7 +531,7 @@ func (b *ZDD) quotRec(f, g int32) int32 {
 		return r
 	}
 
-//line zdd.w:666
+//line zdd.w:667
 	vg := b.mem[g].lvl
 	f1 := b.ezquotRec(f, vg)
 	r := b.quotRec(f1, b.mem[g].hi)
@@ -547,10 +547,10 @@ func (b *ZDD) quotRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, zopQuot, r)
 
-//line zdd.w:663
+//line zdd.w:664
 }
 
-//line zdd.w:683
+//line zdd.w:684
 func (b *ZDD) remRec(f, g int32) int32 {
 	switch {
 	case g == botsink:
@@ -572,24 +572,24 @@ func (b *ZDD) remRec(f, g int32) int32 {
 	return b.memo(f, g, zopRem, r)
 }
 
-//line zdd.w:708
+//line zdd.w:709
 func (b *ZDD) Join(f, g Func) Func { return b.binary(zopProd, f, g) }
 
-//line zdd.w:709
+//line zdd.w:710
 func (b *ZDD) DisjointJoin(f, g Func) Func { return b.binary(zopDisprod, f, g) }
 
-//line zdd.w:710
+//line zdd.w:711
 func (b *ZDD) Meet(f, g Func) Func { return b.binary(zopCoprod, f, g) }
 
-//line zdd.w:711
+//line zdd.w:712
 func (b *ZDD) Delta(f, g Func) Func { return b.binary(zopDelta, f, g) }
 
 func (b *ZDD) Quotient(f, g Func) Func { return b.binary(zopQuot, f, g) }
 
-//line zdd.w:714
+//line zdd.w:715
 func (b *ZDD) Remainder(f, g Func) Func { return b.binary(zopRem, f, g) }
 
-//line zdd.w:735
+//line zdd.w:736
 func (b *ZDD) muxRec(f, g, h int32) int32 {
 	switch {
 	case f == botsink:
@@ -607,7 +607,7 @@ func (b *ZDD) muxRec(f, g, h int32) int32 {
 	}
 	vf, vg, vh := b.mem[f].lvl, b.mem[g].lvl, b.mem[h].lvl
 
-//line zdd.w:756
+//line zdd.w:757
 	for {
 		for vg < vf && vg < vh {
 			g = b.mem[g].lo
@@ -640,9 +640,9 @@ func (b *ZDD) muxRec(f, g, h int32) int32 {
 		}
 	}
 
-//line zdd.w:752
+//line zdd.w:753
 
-//line zdd.w:789
+//line zdd.w:790
 	v := min(vf, vg, vh)
 	if f == b.taut(v) {
 		b.ref(g)
@@ -665,7 +665,7 @@ func (b *ZDD) muxRec(f, g, h int32) int32 {
 		b.ref(r1)
 	} else {
 
-//line zdd.w:817
+//line zdd.w:818
 		g0, g1, h0, h1 := g, botsink, h, botsink
 		if vg == v {
 			g0, g1 = b.mem[g].lo, b.mem[g].hi
@@ -676,19 +676,19 @@ func (b *ZDD) muxRec(f, g, h int32) int32 {
 		r0 = b.muxRec(b.mem[f].lo, g0, h0)
 		r1 = b.muxRec(b.mem[f].hi, g1, h1)
 
-//line zdd.w:811
+//line zdd.w:812
 	}
 	return b.memo(f, g, key, b.uniqueFind(v, r0, r1))
 
-//line zdd.w:753
+//line zdd.w:754
 }
 
-//line zdd.w:831
+//line zdd.w:832
 func (b *ZDD) medRec(f, g, h int32) int32 {
 	vf, vg, vh := b.mem[f].lvl, b.mem[g].lvl, b.mem[h].lvl
 	for {
 
-//line zdd.w:857
+//line zdd.w:858
 		if vg < vf || (vg == vf && g < f) {
 			f, g, vf, vg = g, f, vg, vf
 		}
@@ -699,7 +699,7 @@ func (b *ZDD) medRec(f, g, h int32) int32 {
 			f, g, vf, vg = g, f, vg, vf
 		}
 
-//line zdd.w:835
+//line zdd.w:836
 		switch {
 		case h == botsink:
 			return b.andRec(f, g) // $\langle fg\emptyset\rangle=f\cap g$
@@ -719,7 +719,7 @@ func (b *ZDD) medRec(f, g, h int32) int32 {
 		}
 	}
 
-//line zdd.w:868
+//line zdd.w:869
 	key := ternKey(h, zternMed)
 	if r := b.cacheLookup(f, g, key); r != null {
 		return r
@@ -737,10 +737,10 @@ func (b *ZDD) medRec(f, g, h int32) int32 {
 	}
 	return b.memo(f, g, key, b.uniqueFind(vf, r0, r1))
 
-//line zdd.w:854
+//line zdd.w:855
 }
 
-//line zdd.w:888
+//line zdd.w:889
 func (b *ZDD) and3Rec(f, g, h int32) int32 {
 	vf, vg, vh := b.mem[f].lvl, b.mem[g].lvl, b.mem[h].lvl
 restart:
@@ -761,7 +761,7 @@ restart:
 		return b.andRec(g, h)
 	}
 
-//line zdd.w:912
+//line zdd.w:913
 	for vf != vh {
 		if vf < vh {
 			if h == botsink {
@@ -774,9 +774,9 @@ restart:
 		h, vh = b.mem[h].lo, b.mem[b.mem[h].lo].lvl
 	}
 
-//line zdd.w:908
+//line zdd.w:909
 
-//line zdd.w:947
+//line zdd.w:948
 	if f > g {
 		f, g = g, f
 	}
@@ -787,7 +787,7 @@ restart:
 		f, g = g, f
 	}
 
-//line zdd.w:926
+//line zdd.w:927
 	switch {
 	case f == g:
 		return b.andRec(g, h)
@@ -808,10 +808,10 @@ restart:
 	r1 := b.and3Rec(b.mem[f].hi, b.mem[g].hi, b.mem[h].hi)
 	return b.memo(f, g, key, b.uniqueFind(vf, r0, r1))
 
-//line zdd.w:909
+//line zdd.w:910
 }
 
-//line zdd.w:962
+//line zdd.w:963
 func (b *ZDD) buildRec(f, g, h int32) int32 {
 	if f <= topsink {
 		b.ref(f)
@@ -829,7 +829,7 @@ func (b *ZDD) buildRec(f, g, h int32) int32 {
 	return b.uniqueFind(vf, g, h)
 }
 
-//line zdd.w:982
+//line zdd.w:983
 func (b *ZDD) ternary(op int32, f, g, h Func) Func {
 	p, q, s := b.node(f), b.node(g), b.node(h)
 	b.drain()
@@ -846,17 +846,17 @@ func (b *ZDD) ternary(op int32, f, g, h Func) Func {
 
 func (b *ZDD) Ite(f, g, h Func) Func { return b.ternary(zternMux, f, g, h) }
 
-//line zdd.w:997
+//line zdd.w:998
 func (b *ZDD) Median(f, g, h Func) Func { return b.ternary(zternMed, f, g, h) }
 
-//line zdd.w:998
+//line zdd.w:999
 func (b *ZDD) And3(f, g, h Func) Func { return b.ternary(zternAnd3, f, g, h) }
 
 func (b *ZDD) Build(e, lo, hi Func) Func {
 	return b.ternary(zternBuild, e, lo, hi)
 }
 
-//line zdd.w:1016
+//line zdd.w:1017
 func (b *ZDD) symfunc(p, v, k int32) int32 {
 	vp := b.mem[p].lvl
 	for vp < v {
@@ -865,7 +865,7 @@ func (b *ZDD) symfunc(p, v, k int32) int32 {
 	}
 	if vp == b.n {
 
-//line zdd.w:1035
+//line zdd.w:1036
 		if k > 0 {
 			return botsink
 		}
@@ -873,14 +873,14 @@ func (b *ZDD) symfunc(p, v, k int32) int32 {
 		b.ref(q)
 		return q
 
-//line zdd.w:1024
+//line zdd.w:1025
 	}
 	key := ternKey(b.taut(k), zternSym)
 	if r := b.cacheLookup(p, b.taut(v), key); r != null {
 		return r
 	}
 
-//line zdd.w:1048
+//line zdd.w:1049
 	q := b.symfunc(b.mem[p].lo, vp+1, k)
 	if k > 0 {
 		r := b.symfunc(b.mem[p].lo, vp+1, k-1)
@@ -893,10 +893,10 @@ func (b *ZDD) symfunc(p, v, k int32) int32 {
 	}
 	return b.memo(p, b.taut(v), key, q)
 
-//line zdd.w:1030
+//line zdd.w:1031
 }
 
-//line zdd.w:1066
+//line zdd.w:1067
 func (b *ZDD) projection(v int32) int32 {
 	if b.vars[v].proj == null {
 		b.vars[v].proj = b.symfunc(b.vars[v].elt, 0, 1)
@@ -915,7 +915,7 @@ func (b *ZDD) Sym(p Func, k int) Func {
 	return b.wrap(b.symfunc(q, 0, int32(k)))
 }
 
-//line zdd.w:1090
+//line zdd.w:1091
 func (b *ZDD) Count(f Func) *big.Int {
 	p := b.node(f)
 	b.drain()
@@ -935,7 +935,7 @@ func (b *ZDD) countRec(p int32, seen map[int32]*big.Int) *big.Int {
 	return c
 }
 
-//line zdd.w:1112
+//line zdd.w:1113
 func (b *ZDD) Size(f Func) int {
 	seen := map[int32]bool{}
 	b.reach(b.node(f), seen)
@@ -955,7 +955,7 @@ func (b *ZDD) Profile(f Func) []int {
 	return prof
 }
 
-//line zdd.w:1132
+//line zdd.w:1133
 func (b *ZDD) Support(f Func) []int {
 	seen := map[int32]bool{}
 	b.reach(b.node(f), seen)
@@ -969,7 +969,7 @@ func (b *ZDD) Support(f Func) []int {
 	return slices.Compact(out)
 }
 
-//line zdd.w:1149
+//line zdd.w:1150
 func (b *ZDD) Contains(f Func, set []int) bool {
 	p := b.node(f)
 	in := make(map[int32]bool, len(set))
@@ -988,7 +988,7 @@ func (b *ZDD) Contains(f Func, set []int) bool {
 	return p == topsink && need == 0
 }
 
-//line zdd.w:1171
+//line zdd.w:1172
 func (b *ZDD) Subsets(f Func) iter.Seq[[]int] {
 	p := b.node(f)
 	b.drain()
@@ -1013,7 +1013,7 @@ func (b *ZDD) walkSubsets(p int32, cur []int, yield func([]int) bool) bool {
 	return b.walkSubsets(b.mem[p].hi, append(cur, name), yield)
 }
 
-//line zdd.w:1199
+//line zdd.w:1200
 func (b *ZDD) Random(f Func, rnd *rand.Rand) ([]int, bool) {
 	p := b.node(f)
 	b.drain()
@@ -1039,7 +1039,7 @@ func (b *ZDD) Random(f Func, rnd *rand.Rand) ([]int, bool) {
 	return out, true
 }
 
-//line zdd.w:1242
+//line zdd.w:1243
 func (b *ZDD) weightAt(p int32, w []int) int {
 	if e := int(b.vars[b.mem[p].lvl].name); e < len(w) {
 		return w[e]
@@ -1062,7 +1062,7 @@ func (b *ZDD) bestRec(p int32, w []int, best map[int32]int) int {
 	return v
 }
 
-//line zdd.w:1268
+//line zdd.w:1269
 func (b *ZDD) MaxWeight(f Func, w []int) ([]int, int, bool) {
 	p := b.node(f)
 	b.drain()
@@ -1072,7 +1072,7 @@ func (b *ZDD) MaxWeight(f Func, w []int) ([]int, int, bool) {
 	best := map[int32]int{}
 	total := b.bestRec(p, w, best)
 
-//line zdd.w:1283
+//line zdd.w:1284
 	var out []int
 	for p > topsink {
 		if b.weightAt(p, w)+b.bestRec(b.mem[p].hi, w, best) == best[p] {
@@ -1085,5 +1085,5 @@ func (b *ZDD) MaxWeight(f Func, w []int) ([]int, int, bool) {
 	slices.Sort(out)
 	return out, total, true
 
-//line zdd.w:1277
+//line zdd.w:1278
 }

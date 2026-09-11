@@ -6,6 +6,7 @@
 @s big.Int int
 @s Seq int
 @s Rand int
+@s base int
 
 @* ZDD 엔진.
 BDD의 첫째 축약 규칙은 ``두 갈래가 같은 곳으로 가면 그 노드는 필요 없다''였다.

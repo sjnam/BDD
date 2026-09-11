@@ -1,4 +1,4 @@
-//line bdd.w:36
+//line bdd.w:37
 package bdd
 
 import (
@@ -7,10 +7,10 @@ import (
 	"math/rand/v2"
 )
 
-//line bdd.w:51
+//line bdd.w:52
 type BDD struct{ base }
 
-//line bdd.w:102
+//line bdd.w:103
 const (
 	opAnd       = int32(1)  // $f\land g$
 	opButnot    = int32(2)  // $f\land\bar g$
@@ -25,7 +25,7 @@ const (
 	opExist     = int32(15) // $\exists$
 )
 
-//line bdd.w:543
+//line bdd.w:544
 const (
 	ternMux      = int32(0) // $f{?}\,g{:}\,h$
 	ternMed      = int32(1) // $\langle fgh\rangle$
@@ -33,14 +33,14 @@ const (
 	ternAndExist = int32(3) // $(f\land g)\mathbin{\rm E}h$
 )
 
-//line bdd.w:56
+//line bdd.w:57
 func New() *BDD {
 	b := new(BDD)
 	b.init(false)
 	return b
 }
 
-//line bdd.w:69
+//line bdd.w:70
 func (b *BDD) projection(name int32) int32 {
 	v := b.level(name)
 	b.newLevel(v)
@@ -53,10 +53,10 @@ func (b *BDD) projection(name int32) int32 {
 	return p
 }
 
-//line bdd.w:84
+//line bdd.w:85
 func (b *BDD) Zero() Func { return b.wrap(botsink) }
 
-//line bdd.w:85
+//line bdd.w:86
 func (b *BDD) One() Func { return b.wrap(topsink) }
 
 func (b *BDD) Var(k int) Func {
@@ -64,7 +64,7 @@ func (b *BDD) Var(k int) Func {
 	return b.wrap(b.projection(int32(k)))
 }
 
-//line bdd.w:119
+//line bdd.w:120
 func (b *BDD) binary(op int32, f, g Func) Func {
 	p, q := b.node(f), b.node(g)
 	b.drain()
@@ -95,28 +95,28 @@ func (b *BDD) binaryRec(op, f, g int32) int32 {
 	return b.existRec(f, g)
 }
 
-//line bdd.w:152
+//line bdd.w:153
 func (b *BDD) And(f, g Func) Func { return b.binary(opAnd, f, g) }
 
-//line bdd.w:153
+//line bdd.w:154
 func (b *BDD) Or(f, g Func) Func { return b.binary(opOr, f, g) }
 
-//line bdd.w:154
+//line bdd.w:155
 func (b *BDD) Xor(f, g Func) Func { return b.binary(opXor, f, g) }
 
 func (b *BDD) Butnot(f, g Func) Func { return b.binary(opButnot, f, g) }
 
-//line bdd.w:157
+//line bdd.w:158
 func (b *BDD) Notbut(f, g Func) Func { return b.binary(opNotbut, f, g) }
 
-//line bdd.w:162
+//line bdd.w:163
 func (b *BDD) Not(f Func) Func {
 	p := b.node(f)
 	b.drain()
 	return b.wrap(b.xorRec(topsink, p))
 }
 
-//line bdd.w:175
+//line bdd.w:176
 func (b *BDD) andRec(f, g int32) int32 {
 	if f == g {
 		b.ref(f)
@@ -136,7 +136,7 @@ func (b *BDD) andRec(f, g int32) int32 {
 		return r
 	}
 
-//line bdd.w:211
+//line bdd.w:212
 	v := min(b.mem[f].lvl, b.mem[g].lvl)
 	f0, f1, g0, g1 := f, f, g, g
 	if b.mem[f].lvl == v {
@@ -146,17 +146,17 @@ func (b *BDD) andRec(f, g int32) int32 {
 		g0, g1 = b.mem[g].lo, b.mem[g].hi
 	}
 
-//line bdd.w:202
+//line bdd.w:203
 	r0 := b.andRec(f0, g0)
 	r1 := b.andRec(f1, g1)
 	r := b.uniqueFind(v, r0, r1)
 	b.cacheInsert(f, g, opAnd, r)
 	return r
 
-//line bdd.w:194
+//line bdd.w:195
 }
 
-//line bdd.w:223
+//line bdd.w:224
 func (b *BDD) orRec(f, g int32) int32 {
 	if f == g {
 		b.ref(f)
@@ -176,7 +176,7 @@ func (b *BDD) orRec(f, g int32) int32 {
 		return r
 	}
 
-//line bdd.w:211
+//line bdd.w:212
 	v := min(b.mem[f].lvl, b.mem[g].lvl)
 	f0, f1, g0, g1 := f, f, g, g
 	if b.mem[f].lvl == v {
@@ -186,17 +186,17 @@ func (b *BDD) orRec(f, g int32) int32 {
 		g0, g1 = b.mem[g].lo, b.mem[g].hi
 	}
 
-//line bdd.w:246
+//line bdd.w:247
 	r0 := b.orRec(f0, g0)
 	r1 := b.orRec(f1, g1)
 	r := b.uniqueFind(v, r0, r1)
 	b.cacheInsert(f, g, opOr, r)
 	return r
 
-//line bdd.w:242
+//line bdd.w:243
 }
 
-//line bdd.w:259
+//line bdd.w:260
 func (b *BDD) xorRec(f, g int32) int32 {
 	if f == g {
 		return botsink // $f\oplus f=0$
@@ -212,7 +212,7 @@ func (b *BDD) xorRec(f, g int32) int32 {
 		return r
 	}
 
-//line bdd.w:211
+//line bdd.w:212
 	v := min(b.mem[f].lvl, b.mem[g].lvl)
 	f0, f1, g0, g1 := f, f, g, g
 	if b.mem[f].lvl == v {
@@ -222,17 +222,17 @@ func (b *BDD) xorRec(f, g int32) int32 {
 		g0, g1 = b.mem[g].lo, b.mem[g].hi
 	}
 
-//line bdd.w:278
+//line bdd.w:279
 	r0 := b.xorRec(f0, g0)
 	r1 := b.xorRec(f1, g1)
 	r := b.uniqueFind(v, r0, r1)
 	b.cacheInsert(f, g, opXor, r)
 	return r
 
-//line bdd.w:274
+//line bdd.w:275
 }
 
-//line bdd.w:292
+//line bdd.w:293
 func (b *BDD) constrainRec(f, g int32) int32 {
 	switch {
 	case g == botsink:
@@ -247,7 +247,7 @@ func (b *BDD) constrainRec(f, g int32) int32 {
 		return r
 	}
 
-//line bdd.w:211
+//line bdd.w:212
 	v := min(b.mem[f].lvl, b.mem[g].lvl)
 	f0, f1, g0, g1 := f, f, g, g
 	if b.mem[f].lvl == v {
@@ -257,7 +257,7 @@ func (b *BDD) constrainRec(f, g int32) int32 {
 		g0, g1 = b.mem[g].lo, b.mem[g].hi
 	}
 
-//line bdd.w:313
+//line bdd.w:314
 	if b.mem[g].lvl <= b.mem[f].lvl {
 		if g0 == botsink {
 			return b.memo(f, g, opConstrain, b.constrainRec(f1, g1))
@@ -272,10 +272,10 @@ func (b *BDD) constrainRec(f, g int32) int32 {
 	b.cacheInsert(f, g, opConstrain, r)
 	return r
 
-//line bdd.w:306
+//line bdd.w:307
 }
 
-//line bdd.w:346
+//line bdd.w:347
 func (b *BDD) existRec(f, g int32) int32 {
 	for {
 		if g <= topsink || f <= topsink {
@@ -291,7 +291,7 @@ func (b *BDD) existRec(f, g int32) int32 {
 			return r
 		}
 
-//line bdd.w:371
+//line bdd.w:372
 		g1 := g
 		if vg == v {
 			g1 = b.mem[g].hi
@@ -310,11 +310,11 @@ func (b *BDD) existRec(f, g int32) int32 {
 		}
 		return b.memo(f, g, opExist, r)
 
-//line bdd.w:361
+//line bdd.w:362
 	}
 }
 
-//line bdd.w:392
+//line bdd.w:393
 func (b *BDD) allRec(f, g int32) int32 {
 	for {
 		if g <= topsink || f <= topsink {
@@ -330,7 +330,7 @@ func (b *BDD) allRec(f, g int32) int32 {
 			return r
 		}
 
-//line bdd.w:411
+//line bdd.w:412
 		g1 := g
 		if vg == v {
 			g1 = b.mem[g].hi
@@ -349,11 +349,11 @@ func (b *BDD) allRec(f, g int32) int32 {
 		}
 		return b.memo(f, g, opAll, r)
 
-//line bdd.w:407
+//line bdd.w:408
 	}
 }
 
-//line bdd.w:432
+//line bdd.w:433
 func (b *BDD) diffRec(f, g int32) int32 {
 	if g <= topsink {
 		b.ref(f)
@@ -370,7 +370,7 @@ func (b *BDD) diffRec(f, g int32) int32 {
 		return r
 	}
 
-//line bdd.w:451
+//line bdd.w:452
 	g1 := g
 	if vg == v {
 		g1 = b.mem[g].hi
@@ -387,10 +387,10 @@ func (b *BDD) diffRec(f, g int32) int32 {
 	}
 	return b.memo(f, g, opDiff, r)
 
-//line bdd.w:448
+//line bdd.w:449
 }
 
-//line bdd.w:477
+//line bdd.w:478
 func (b *BDD) yesNoRec(op, f, g int32) int32 {
 	if g <= topsink {
 		b.ref(f)
@@ -407,7 +407,7 @@ func (b *BDD) yesNoRec(op, f, g int32) int32 {
 		return r
 	}
 
-//line bdd.w:498
+//line bdd.w:499
 	g1 := g
 	if vg == v {
 		g1 = b.mem[g].hi
@@ -431,26 +431,26 @@ func (b *BDD) yesNoRec(op, f, g int32) int32 {
 	}
 	return b.memo(f, g, op, r)
 
-//line bdd.w:493
+//line bdd.w:494
 }
 
-//line bdd.w:525
+//line bdd.w:526
 func (b *BDD) Exists(f, g Func) Func { return b.binary(opExist, f, g) }
 
-//line bdd.w:526
+//line bdd.w:527
 func (b *BDD) Forall(f, g Func) Func { return b.binary(opAll, f, g) }
 
 func (b *BDD) Diff(f, g Func) Func { return b.binary(opDiff, f, g) }
 
-//line bdd.w:529
+//line bdd.w:530
 func (b *BDD) Yes(f, g Func) Func { return b.binary(opYes, f, g) }
 
-//line bdd.w:530
+//line bdd.w:531
 func (b *BDD) No(f, g Func) Func { return b.binary(opNo, f, g) }
 
 func (b *BDD) Constrain(f, g Func) Func { return b.binary(opConstrain, f, g) }
 
-//line bdd.w:557
+//line bdd.w:558
 func (b *BDD) muxRec(f, g, h int32) int32 {
 	switch {
 	case f <= topsink:
@@ -474,7 +474,7 @@ func (b *BDD) muxRec(f, g, h int32) int32 {
 		return r
 	}
 
-//line bdd.w:591
+//line bdd.w:592
 	v := min(b.mem[f].lvl, b.mem[g].lvl, b.mem[h].lvl)
 	f0, f1, g0, g1, h0, h1 := f, f, g, g, h, h
 	if b.mem[f].lvl == v {
@@ -487,19 +487,19 @@ func (b *BDD) muxRec(f, g, h int32) int32 {
 		h0, h1 = b.mem[h].lo, b.mem[h].hi
 	}
 
-//line bdd.w:584
+//line bdd.w:585
 	r0 := b.muxRec(f0, g0, h0)
 	r1 := b.muxRec(f1, g1, h1)
 	r := b.uniqueFind(v, r0, r1)
 	return b.memo(f, g, ternKey(h, ternMux), r)
 
-//line bdd.w:580
+//line bdd.w:581
 }
 
-//line bdd.w:607
+//line bdd.w:608
 func (b *BDD) medRec(f, g, h int32) int32 {
 
-//line bdd.w:629
+//line bdd.w:630
 	if f > g {
 		f, g = g, f
 	}
@@ -510,7 +510,7 @@ func (b *BDD) medRec(f, g, h int32) int32 {
 		f, g = g, f
 	}
 
-//line bdd.w:609
+//line bdd.w:610
 	switch {
 	case f <= topsink:
 		if f == topsink {
@@ -528,7 +528,7 @@ func (b *BDD) medRec(f, g, h int32) int32 {
 		return r
 	}
 
-//line bdd.w:591
+//line bdd.w:592
 	v := min(b.mem[f].lvl, b.mem[g].lvl, b.mem[h].lvl)
 	f0, f1, g0, g1, h0, h1 := f, f, g, g, h, h
 	if b.mem[f].lvl == v {
@@ -541,19 +541,19 @@ func (b *BDD) medRec(f, g, h int32) int32 {
 		h0, h1 = b.mem[h].lo, b.mem[h].hi
 	}
 
-//line bdd.w:641
+//line bdd.w:642
 	r0 := b.medRec(f0, g0, h0)
 	r1 := b.medRec(f1, g1, h1)
 	r := b.uniqueFind(v, r0, r1)
 	return b.memo(f, g, ternKey(h, ternMed), r)
 
-//line bdd.w:626
+//line bdd.w:627
 }
 
-//line bdd.w:649
+//line bdd.w:650
 func (b *BDD) andAndRec(f, g, h int32) int32 {
 
-//line bdd.w:629
+//line bdd.w:630
 	if f > g {
 		f, g = g, f
 	}
@@ -564,7 +564,7 @@ func (b *BDD) andAndRec(f, g, h int32) int32 {
 		f, g = g, f
 	}
 
-//line bdd.w:651
+//line bdd.w:652
 	switch {
 	case f <= topsink:
 		if f == topsink {
@@ -580,7 +580,7 @@ func (b *BDD) andAndRec(f, g, h int32) int32 {
 		return r
 	}
 
-//line bdd.w:591
+//line bdd.w:592
 	v := min(b.mem[f].lvl, b.mem[g].lvl, b.mem[h].lvl)
 	f0, f1, g0, g1, h0, h1 := f, f, g, g, h, h
 	if b.mem[f].lvl == v {
@@ -593,16 +593,16 @@ func (b *BDD) andAndRec(f, g, h int32) int32 {
 		h0, h1 = b.mem[h].lo, b.mem[h].hi
 	}
 
-//line bdd.w:670
+//line bdd.w:671
 	r0 := b.andAndRec(f0, g0, h0)
 	r1 := b.andAndRec(f1, g1, h1)
 	r := b.uniqueFind(v, r0, r1)
 	return b.memo(f, g, ternKey(h, ternAndAnd), r)
 
-//line bdd.w:666
+//line bdd.w:667
 }
 
-//line bdd.w:680
+//line bdd.w:681
 func (b *BDD) andExistRec(f, g, h int32) int32 {
 	for {
 		switch {
@@ -629,7 +629,7 @@ func (b *BDD) andExistRec(f, g, h int32) int32 {
 			continue
 		}
 
-//line bdd.w:710
+//line bdd.w:711
 		vh := b.mem[h].lvl
 		f0, f1, g0, g1, h1 := f, f, g, g, h
 		if b.mem[f].lvl == v {
@@ -655,11 +655,11 @@ func (b *BDD) andExistRec(f, g, h int32) int32 {
 		}
 		return b.memo(f, g, ternKey(h, ternAndExist), r)
 
-//line bdd.w:706
+//line bdd.w:707
 	}
 }
 
-//line bdd.w:739
+//line bdd.w:740
 func (b *BDD) ternary(op int32, f, g, h Func) Func {
 	p, q, s := b.node(f), b.node(g), b.node(h)
 	b.drain()
@@ -676,18 +676,18 @@ func (b *BDD) ternary(op int32, f, g, h Func) Func {
 
 func (b *BDD) Ite(f, g, h Func) Func { return b.ternary(ternMux, f, g, h) }
 
-//line bdd.w:754
+//line bdd.w:755
 func (b *BDD) Median(f, g, h Func) Func { return b.ternary(ternMed, f, g, h) }
 
-//line bdd.w:755
+//line bdd.w:756
 func (b *BDD) And3(f, g, h Func) Func { return b.ternary(ternAndAnd, f, g, h) }
 
-//line bdd.w:756
+//line bdd.w:757
 func (b *BDD) AndExists(f, g, h Func) Func {
 	return b.ternary(ternAndExist, f, g, h)
 }
 
-//line bdd.w:786
+//line bdd.w:787
 func (b *BDD) setRepl(name, q int32) {
 	if b.stamp == ^uint32(0) {
 		b.collectGarbage(true) // 도장이 한 바퀴 돌았다 (그럴 성싶지 않지만)
@@ -705,7 +705,7 @@ func (b *BDD) setRepl(name, q int32) {
 	if q != null {
 		b.ref(q)
 
-//line bdd.w:830
+//line bdd.w:831
 		if !b.stampChg {
 			b.stampChg = true
 			b.stamp++
@@ -715,14 +715,14 @@ func (b *BDD) setRepl(name, q int32) {
 			v--
 		}
 
-//line bdd.w:803
+//line bdd.w:804
 		return
 	}
 
-//line bdd.w:809
+//line bdd.w:810
 	if v+1 < int32(len(b.vars)) && b.vars[v+1].stamp != 0 {
 
-//line bdd.w:830
+//line bdd.w:831
 		if !b.stampChg {
 			b.stampChg = true
 			b.stamp++
@@ -732,7 +732,7 @@ func (b *BDD) setRepl(name, q int32) {
 			v--
 		}
 
-//line bdd.w:811
+//line bdd.w:812
 		return
 	}
 	for v >= 0 && b.vars[v].repl == null {
@@ -741,7 +741,7 @@ func (b *BDD) setRepl(name, q int32) {
 	}
 	if v >= 0 {
 
-//line bdd.w:830
+//line bdd.w:831
 		if !b.stampChg {
 			b.stampChg = true
 			b.stamp++
@@ -751,7 +751,7 @@ func (b *BDD) setRepl(name, q int32) {
 			v--
 		}
 
-//line bdd.w:819
+//line bdd.w:820
 		return
 	}
 	if b.stampChg {
@@ -759,10 +759,10 @@ func (b *BDD) setRepl(name, q int32) {
 	}
 	b.stampChg = false
 
-//line bdd.w:806
+//line bdd.w:807
 }
 
-//line bdd.w:841
+//line bdd.w:842
 func (b *BDD) composeRec(f int32) int32 {
 	if f <= topsink {
 		return f
@@ -777,7 +777,7 @@ func (b *BDD) composeRec(f int32) int32 {
 		return r
 	}
 
-//line bdd.w:861
+//line bdd.w:862
 	r0 := b.composeRec(b.mem[f].lo)
 	r1 := b.composeRec(b.mem[f].hi)
 	y := b.vars[vf].repl
@@ -789,10 +789,10 @@ func (b *BDD) composeRec(f int32) int32 {
 	b.deref(r1)
 	return b.memo(f, stamp, 0, r)
 
-//line bdd.w:855
+//line bdd.w:856
 }
 
-//line bdd.w:877
+//line bdd.w:878
 func (b *BDD) Compose(f Func, y map[int]Func) Func {
 	p := b.node(f)
 	names := make([]int32, 0, len(y))
@@ -813,7 +813,7 @@ func (b *BDD) Compose(f Func, y map[int]Func) Func {
 	return b.wrap(r)
 }
 
-//line bdd.w:910
+//line bdd.w:911
 func (b *BDD) Count(f Func) *big.Int {
 	p := b.node(f)
 	b.drain()
@@ -838,14 +838,14 @@ func (b *BDD) countRec(p int32, rk []int32, seen map[int32]*big.Int) *big.Int {
 	return c
 }
 
-//line bdd.w:938
+//line bdd.w:939
 func (b *BDD) Size(f Func) int {
 	seen := map[int32]bool{}
 	b.reach(b.node(f), seen)
 	return len(seen)
 }
 
-//line bdd.w:948
+//line bdd.w:949
 func (b *BDD) Profile(f Func) []int {
 	seen := map[int32]bool{}
 	b.reach(b.node(f), seen)
@@ -877,7 +877,7 @@ func (b *BDD) Support(f Func) []int {
 	return out
 }
 
-//line bdd.w:982
+//line bdd.w:983
 func (b *BDD) Eval(f Func, x []bool) bool {
 	p := b.node(f)
 	for p > topsink {
@@ -891,7 +891,7 @@ func (b *BDD) Eval(f Func, x []bool) bool {
 	return p == topsink
 }
 
-//line bdd.w:1003
+//line bdd.w:1004
 func (b *BDD) All(f Func) iter.Seq[[]bool] {
 	p := b.node(f)
 	b.drain()
@@ -907,7 +907,7 @@ func (b *BDD) All(f Func) iter.Seq[[]bool] {
 	}
 }
 
-//line bdd.w:1021
+//line bdd.w:1022
 func (b *BDD) walkAll(p int32, i int, lv, names []int32, x []bool,
 	yield func([]bool) bool) bool {
 	switch {
@@ -928,7 +928,7 @@ func (b *BDD) walkAll(p int32, i int, lv, names []int32, x []bool,
 	return b.walkAll(hi, i+1, lv, names, x, yield)
 }
 
-//line bdd.w:1046
+//line bdd.w:1047
 func (b *BDD) Random(f Func, rnd *rand.Rand) ([]bool, bool) {
 	p := b.node(f)
 	b.drain()
@@ -940,7 +940,7 @@ func (b *BDD) Random(f Func, rnd *rand.Rand) ([]bool, bool) {
 		return nil, false
 	}
 
-//line bdd.w:1060
+//line bdd.w:1061
 	width := 0
 	for _, v := range lv {
 		width = max(width, int(b.vars[v].name)+1)
@@ -968,5 +968,5 @@ func (b *BDD) Random(f Func, rnd *rand.Rand) ([]bool, bool) {
 	}
 	return x, true
 
-//line bdd.w:1057
+//line bdd.w:1058
 }

@@ -6,6 +6,7 @@
 @s Int int
 @s Seq int
 @s Rand int
+@s base int
 
 @* BDD 엔진.
 {\it 이진 결정 다이어그램\/}(binary decision diagram)은 불 함수를 그림 하나로
